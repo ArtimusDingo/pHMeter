@@ -1,5 +1,4 @@
 #include <MicroStat.h>
-
 using namespace std;
 
 void Nugget::Add(double _value)
@@ -23,12 +22,12 @@ MicroStat::MicroStat()
 double MicroStat::sumxyproduct(Nugget& xdata, Nugget& ydata)
 {
     double SumXYProduct = 0.0;
-    int loopsize = xdata.data.size() - 1;
-    for(int i = 0; i <= loopsize ; i++)
+    int loopsize = xdata.data.size();
+    for(int i = 0; i < loopsize ; i++)
     {
         SumXYProduct += xdata.data[i] * ydata.data[i];
     } 
-    return SumXYProduct ;
+    return SumXYProduct;
 }
 
 double MicroStat::sumsquared(Nugget& data)
@@ -58,11 +57,11 @@ double MicroStat::stdev(Nugget& data)
     int loop = data.data.size();
     double mean = average(data);
     double dev = 0.0;
-    for(int i = 0; i <= loop; i++)
+    for(int i = 0; i < loop; i++)
     {
         dev = dev + ((data.data[i] - mean) * (data.data[i] - mean));
     }
-    return sqrt(dev / (loop * 1.0));
+    return sqrt(dev / ((loop - 1)* 1.0));
 }
 
 void MicroStat::AddNugget()
@@ -98,8 +97,8 @@ void MicroStat::Regression(Nugget& xdata, Nugget& ydata)
 }
 
 double MicroStat::RSD(Nugget& data)
-{
-    return (stdev(data) / average(data)) * 1.0;
+{ 
+  return ((stdev(data) / average(data)) * 1.0) * 100.0;
 }
 
 double MicroStat::Interpolate(double _reading)
