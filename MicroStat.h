@@ -1,5 +1,5 @@
-#ifndef Probe_h
-#define Probe_h
+#ifndef MicroStat_h
+#define MicroStat_h
 #endif
 
 #include <math.h>
@@ -8,31 +8,30 @@
 
 struct Nugget
 {
-
     std::vector <double> data;
-    char* Name;
     void Add(double);
     void Add(std::vector<double>);
-    double Sum();
-    double Average();
-    double SumSquared();
 };
 
 class MicroStat
 {
     public:
-   
     std::vector <Nugget> Nuggets;
     MicroStat();
     void AddNugget();
     void AddNugget(std::vector<Nugget>);
     void AddValue(double, int);
     void AddValue(std::vector<double>, int);
-    void Regression(Nugget*, Nugget*);
-    double* slope;
-    double* intercept;
+    void Regression(Nugget&, Nugget&);
+    double Interpolate(double);
+    double RSD(Nugget&);
+    double slope;
+    double intercept;
     private: 
-    double SumXYProduct(Nugget*, Nugget*);
-    
+    double sumxyproduct(Nugget&, Nugget&);
+    double sumsquared(Nugget&);
+    double stdev(Nugget&);
+    double sum(Nugget&);
+    double average(Nugget&);
 };
 

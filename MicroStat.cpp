@@ -13,27 +13,6 @@ void Nugget::Add(std::vector<double> _values)
     data.insert(data.end(), _values.begin(), _values.end());
 }
 
-double Nugget::Sum()
-{
-    return accumulate(data.begin(), data.end(), 0.0);
-}
-
-double Nugget::Average()
-{
-    double sum = accumulate(data.begin(), data.end(), 0.0);
-    return sum / (data.size() * 1.0);       
-}
-
-double Nugget::SumSquared()
-{
-    double sum_squared = 0.0;
-     for(auto itr : data)
-    {
-        sum_squared += (itr * itr);
-    } 
-    return sum_squared;
-}
-
 // MicroStat Methods
 
 MicroStat::MicroStat()
@@ -41,21 +20,55 @@ MicroStat::MicroStat()
 
 }
 
-double MicroStat::SumXYProduct(Nugget* xdata, Nugget* ydata)
+double MicroStat::sumxyproduct(Nugget& xdata, Nugget& ydata)
 {
     double SumXYProduct = 0.0;
-    int loopsize = xdata->data.size() - 1;
+    int loopsize = xdata.data.size() - 1;
     for(int i = 0; i <= loopsize ; i++)
     {
-        SumXYProduct += xdata->data[i] * ydata->data[i];
+        SumXYProduct += xdata.data[i] * ydata.data[i];
     } 
     return SumXYProduct ;
 }
 
+double MicroStat::sumsquared(Nugget& data)
+{
+    double sum_squared = 0.0;
+     for(auto itr : data.data)
+    {
+        sum_squared += (itr * itr);
+    } 
+    return sum_squared;
+}
+
+double MicroStat::sum(Nugget& data)
+{
+    return accumulate(data.data.begin(), data.data.end(), 0.0);
+}
+
+double MicroStat::average(Nugget& data)
+{
+    double sum = accumulate(data.data.begin(), data.data.end(), 0.0);
+    return sum / (data.data.size() * 1.0);       
+}
+
+
+double MicroStat::stdev(Nugget& data)
+{
+    int loop = data.data.size();
+    double mean = average(data);
+    double dev = 0.0;
+    for(int i = 0; i <= loop; i++)
+    {
+        dev = dev + ((data.data[i] - mean) * (data.data[i] - mean));
+    }
+    return sqrt(dev / (loop * 1.0));
+}
+
 void MicroStat::AddNugget()
 {
-    Nugget* newnugget = new Nugget();
-    Nuggets.insert(Nuggets.end(), *newnugget);
+    Nugget newnugget; 
+    Nuggets.insert(Nuggets.end(), newnugget);
 }
 
 void MicroStat::AddNugget(std::vector<Nugget> _nuggets)
@@ -73,16 +86,24 @@ void MicroStat::AddValue(std::vector<double> _value, int _nugget)
     Nuggets[_nugget].Add(_value);
 }
 
-void MicroStat::Regression(Nugget* xdata, Nugget* ydata)
+void MicroStat::Regression(Nugget& xdata, Nugget& ydata)
 {
-    std::vector <double> x = xdata->data; // required to get actual size it seems
-    std::vector <double> y = ydata->data;
-    double xsum = xdata->Sum(); double ysum = ydata->Sum();
-    double n = (x.size() * 1.0); double _slope; double _intercept;
-    double sumxsquared = xdata->SumSquared(); double sumxy = SumXYProduct(xdata, ydata);
-    _slope = ((n*sumxy-xsum*ysum)/(n*sumxsquared-(xsum*xsum)));
-    _intercept = (ysum - _slope*xsum)/n;
-    slope = &_slope;
-    intercept = &_intercept;
+  //  std::vector <double> x = xdata.data; // required to get actual size it seems
+  //  std::vector <double> y = ydata.data;
+    double xsum = sum(xdata); double ysum = sum(ydata);
+    double n = (xdata.data.size() * 1.0); 
+    double sumxsquared = sumsquared(xdata); double sumxy = sumxyproduct(xdata, ydata);
+    slope = ((n*sumxy-xsum*ysum)/(n*sumxsquared-(xsum*xsum)));
+    intercept = (ysum - slope*xsum)/n;
+}
 
+double MicroStat::RSD(Nugget& data)
+{
+    return (stdev(data) / average(data)) * 1.0;
+}
+
+double MicroStat::Interpolate(double _reading)
+{
+    double output = (_reading - intercept)/ (slope);
+    return output;
 }
